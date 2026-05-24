@@ -23,7 +23,6 @@ export default function TradeVault() {
 
   const metrics = calculateMetrics(trades);
 
-  // CSV Export
   const exportToCSV = () => {
     if (trades.length === 0) {
       toast.error("No trades to export");
@@ -32,18 +31,12 @@ export default function TradeVault() {
 
     const headers = ["pair", "direction", "entryTime", "pnl", "rrAchieved", "emotionalState", "disciplineScore", "fomoDetected", "notes"];
     const csvRows = trades.map((t) => [
-      t.pair,
-      t.direction,
-      t.entryTime,
-      t.pnl,
-      t.rrAchieved,
-      t.emotionalState,
-      t.disciplineScore,
-      t.fomoDetected,
+      t.pair, t.direction, t.entryTime, t.pnl, t.rrAchieved,
+      t.emotionalState, t.disciplineScore, t.fomoDetected,
       `"${(t.notes || "").replace(/"/g, '""')}"`
     ]);
 
-    const csvContent = [headers.join(","), ...csvRows.map((row) => row.join(","))].join("\n");
+    const csvContent = [headers.join(","), ...csvRows.map(row => row.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -55,7 +48,6 @@ export default function TradeVault() {
     toast.success("Journal exported successfully");
   };
 
-  // AI Coach
   const getAIInsights = () => {
     const insights: string[] = [];
 
@@ -78,7 +70,7 @@ export default function TradeVault() {
 
   const aiInsights = getAIInsights();
 
-  // Safe calculation for average discipline (prevents NaN)
+  // Safe avg discipline
   let avgDiscipline = "0.0";
   if (trades.length > 0) {
     const total = trades.reduce((sum, t) => sum + t.disciplineScore, 0);
@@ -90,7 +82,6 @@ export default function TradeVault() {
       <Sidebar currentView={currentView} onViewChange={(v) => setCurrentView(v as View)} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Bar */}
         <div className="h-16 border-b border-[#1F1F1F] flex items-center justify-between px-8 bg-[#0A0A0A]/95 backdrop-blur-xl z-50">
           <div className="flex items-center gap-4">
             <div className="text-sm text-[#A1A1AA]">{format(new Date(), "EEEE, dd MMM yyyy")}</div>
@@ -112,7 +103,6 @@ export default function TradeVault() {
 
         <div className="flex-1 overflow-auto p-8">
           <AnimatePresence mode="wait">
-            {/* DASHBOARD */}
             {currentView === "dashboard" && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 max-w-7xl">
                 <div>
@@ -144,19 +134,15 @@ export default function TradeVault() {
                     </div>
 
                     <div className="space-y-3">
-                      {trades.length > 0 ? (
-                        trades.slice(0, 5).map((trade) => (
-                          <div key={trade.id} className="flex items-center justify-between p-4 rounded-2xl bg-[#0A0A0A] border border-[#1F1F1F]">
-                            <div className="flex items-center gap-4">
-                              <div className={`px-3 py-1 rounded-xl text-xs font-mono tracking-widest ${trade.direction === "LONG" ? "bg-emerald-950 text-emerald-400" : "bg-red-950 text-red-400"}`}>{trade.direction}</div>
-                              <div className="font-medium">{trade.pair}</div>
-                            </div>
-                            <div className={`font-mono text-lg tracking-tight ${trade.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>{trade.pnl >= 0 ? "+" : ""}${trade.pnl.toFixed(1)}</div>
+                      {trades.length > 0 ? trades.slice(0, 5).map(trade => (
+                        <div key={trade.id} className="flex items-center justify-between p-4 rounded-2xl bg-[#0A0A0A] border border-[#1F1F1F]">
+                          <div className="flex items-center gap-4">
+                            <div className={`px-3 py-1 rounded-xl text-xs font-mono tracking-widest ${trade.direction === "LONG" ? "bg-emerald-950 text-emerald-400" : "bg-red-950 text-red-400"}`}>{trade.direction}</div>
+                            <div className="font-medium">{trade.pair}</div>
                           </div>
-                        ))
-                      ) : (
-                        <div className="text-center py-8 text-[#A1A1AA] text-sm">No trades logged yet. Start building your edge.</div>
-                      )}
+                          <div className={`font-mono text-lg tracking-tight ${trade.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>{trade.pnl >= 0 ? "+" : ""}${trade.pnl.toFixed(1)}</div>
+                        </div>
+                      )) : <div className="text-center py-8 text-[#A1A1AA] text-sm">No trades logged yet. Start building your edge.</div>}
                     </div>
                   </div>
 
@@ -171,11 +157,9 @@ export default function TradeVault() {
               </motion.div>
             )}
 
-            {/* ANALYTICS */}
             {currentView === "analytics" && (
               <div className="max-w-5xl">
                 <div className="text-3xl font-semibold tracking-[-1px] mb-8">Performance Intelligence</div>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                   <div className="card rounded-3xl p-6">
                     <div className="text-xs text-[#A1A1AA] tracking-widest mb-4">OVERALL</div>
@@ -185,7 +169,6 @@ export default function TradeVault() {
                       <div className="flex justify-between"><span>Expectancy</span><span className="font-mono">${metrics.expectancy}</span></div>
                     </div>
                   </div>
-
                   <div className="card rounded-3xl p-6">
                     <div className="text-xs text-[#A1A1AA] tracking-widest mb-4">STREAKS & RISK</div>
                     <div className="space-y-3 text-sm">
@@ -194,22 +177,19 @@ export default function TradeVault() {
                       <div className="flex justify-between"><span>Max Drawdown</span><span className="font-mono text-red-400">${metrics.maxDrawdown}</span></div>
                     </div>
                   </div>
-
                   <div className="card rounded-3xl p-6">
                     <div className="text-xs text-[#A1A1AA] tracking-widest mb-4">BEHAVIORAL</div>
                     <div className="text-sm text-[#A1A1AA] space-y-1">
-                      <div>FOMO trades: {trades.filter((t) => t.fomoDetected).length}</div>
-                      <div>Revenge trades: {trades.filter((t) => t.revengeTrade).length}</div>
+                      <div>FOMO trades: {trades.filter(t => t.fomoDetected).length}</div>
+                      <div>Revenge trades: {trades.filter(t => t.revengeTrade).length}</div>
                       <div>Avg Discipline: {avgDiscipline}/10</div>
                     </div>
                   </div>
                 </div>
-
                 <EquityCurve trades={trades} />
               </div>
             )}
 
-            {/* AI COACH */}
             {currentView === "coach" && (
               <div className="max-w-2xl mx-auto">
                 <div className="text-3xl font-semibold tracking-[-1px] mb-8">AI Trade Coach</div>
@@ -221,29 +201,15 @@ export default function TradeVault() {
               </div>
             )}
 
-            {/* REPLAY */}
             {currentView === "replay" && <div className="max-w-4xl mx-auto"><ReplayTimeline trades={trades} /></div>}
-
-            {/* GAMIFICATION */}
             {currentView === "gamification" && <div className="max-w-4xl mx-auto"><Gamification trades={trades} metrics={metrics} /></div>}
 
-            {/* SETTINGS */}
             {currentView === "settings" && (
               <div className="max-w-xl">
                 <div className="text-3xl font-semibold tracking-[-1px] mb-8">Settings</div>
                 <div className="card rounded-3xl p-8">
-                  <div className="text-sm text-[#A1A1AA]">More production settings coming in next updates.</div>
-                  <button
-                    onClick={() => {
-                      if (confirm("Clear all local journal data? This cannot be undone.")) {
-                        clearAll();
-                        toast.success("All data cleared");
-                      }
-                    }}
-                    className="mt-6 text-red-400 text-sm underline"
-                  >
-                    Clear All Local Data
-                  </button>
+                  <div className="text-sm text-[#A1A1AA]">More production settings coming soon.</div>
+                  <button onClick={() => { if (confirm("Clear all data?")) { clearAll(); toast.success("Cleared"); } }} className="mt-6 text-red-400 text-sm underline">Clear All Local Data</button>
                 </div>
               </div>
             )}
@@ -251,21 +217,12 @@ export default function TradeVault() {
         </div>
       </div>
 
-      {/* Log Trade Modal */}
       <AnimatePresence>
         {showLogModal && (
           <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-6" onClick={() => setShowLogModal(false)}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 20 }}
-              className="w-full max-w-3xl"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <motion.div initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }} className="w-full max-w-3xl" onClick={e => e.stopPropagation()}>
               <div className="card rounded-3xl p-8 relative">
-                <button onClick={() => setShowLogModal(false)} className="absolute top-6 right-6 text-[#A1A1AA] hover:text-white">
-                  <X size={20} />
-                </button>
+                <button onClick={() => setShowLogModal(false)} className="absolute top-6 right-6 text-[#A1A1AA] hover:text-white"><X size={20} /></button>
                 <TradeLogForm onSuccess={() => { setShowLogModal(false); setCurrentView("dashboard"); }} />
               </div>
             </div>
