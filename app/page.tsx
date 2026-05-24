@@ -78,10 +78,12 @@ export default function TradeVault() {
 
   const aiInsights = getAIInsights();
 
-  // Safe average discipline calculation
-  const avgDiscipline = trades.length > 0
-    ? (trades.reduce((sum, t) => sum + t.disciplineScore, 0) / trades.length).toFixed(1)
-    : "0.0";
+  // Safe calculation for average discipline (prevents NaN)
+  let avgDiscipline = "0.0";
+  if (trades.length > 0) {
+    const total = trades.reduce((sum, t) => sum + t.disciplineScore, 0);
+    avgDiscipline = (total / trades.length).toFixed(1);
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0A0A0A]">
