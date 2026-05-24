@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-geist: 'Geist', system-ui, sans-serif;
+  --font-geist-mono: 'Geist Mono', monospace;
+
+  /* Institutional Dark Theme */
+  --bg: #0A0A0A;
+  --card: #111111;
+  --card-hover: #161616;
+  --border: #1F1F1F;
+  --text-primary: #F5F5F5;
+  --text-secondary: #A1A1AA;
+  --accent: #10B981;
+  --loss: #EF4444;
+  --warning: #F59E0B;
+  --glass: rgba(17, 17, 17, 0.85);
+}
+
+body {
+  font-family: var(--font-geist);
+  background-color: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Institutional Glassmorphism - Subtle & Premium */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  transition: all 0.2s cubic-bezier(0.23, 1.0, 0.32, 1);
+}
+
+.card:hover {
+  background-color: var(--card-hover);
+  border-color: #2A2A2A;
+  transform: translateY(-1px);
+}
+
+/* Precision Data Display */
+.metric-value {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Custom Scrollbar - Clean */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Form Elements - Institutional */
+input, select, textarea {
+  background-color: #0F0F0F;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  transition: all 0.15s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Table Styling */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th {
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+/* Button Styles */
+.btn-primary {
+  background-color: var(--accent);
+  color: #0A0A0A;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover {
+  background-color: #34D399;
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  background-color: #1A1A1A;
+  border-color: #3A3A3A;
+}
+
+/* Toast Styling via Sonner */
+[data-sonner-toaster] {
+  --normal-bg: #111;
+  --normal-text: #F5F5F5;
+  --normal-border: #1F1F1F;
+}
+
+/* Animation Utilities */
+.fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* No retail neon garbage */
+.neon {
+  display: none;
+}
