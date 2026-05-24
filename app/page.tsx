@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Download } from "lucide-react";
+import { Plus, Download, X } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -46,7 +46,7 @@ export default function TradeVault() {
     toast.success("Journal exported successfully");
   };
 
-  // Simple AI Coach (will be enhanced in next iteration)
+  // AI Coach
   const getAIInsights = () => {
     const insights: string[] = [];
     if (metrics.totalTrades > 5 && metrics.winRate < 48) {
@@ -67,12 +67,17 @@ export default function TradeVault() {
 
   const aiInsights = getAIInsights();
 
+  // Safe average discipline (fixes NaN when no trades)
+  const avgDiscipline = trades.length > 0
+    ? (trades.reduce((sum, t) => sum + t.disciplineScore, 0) / trades.length).toFixed(1)
+    : "0.0";
+
   return (
     <div className="flex h-screen overflow-hidden bg-[#0A0A0A]">
       <Sidebar currentView={currentView} onViewChange={(v) => setCurrentView(v as View)} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Navigation Bar */}
+        {/* Top Bar */}
         <div className="h-16 border-b border-[#1F1F1F] flex items-center justify-between px-8 bg-[#0A0A0A]/95 backdrop-blur-xl z-50">
           <div className="flex items-center gap-4">
             <div className="text-sm text-[#A1A1AA]">{format(new Date(), "EEEE, dd MMM yyyy")}</div>
@@ -86,16 +91,12 @@ export default function TradeVault() {
             <button onClick={exportToCSV} className="btn-ghost flex items-center gap-2 px-5 py-2 rounded-2xl text-sm">
               <Download size={16} /> EXPORT CSV
             </button>
-            <button
-              onClick={() => setShowLogModal(true)}
-              className="btn-primary flex items-center gap-2 px-6 py-2 rounded-2xl text-sm font-medium"
-            >
+            <button onClick={() => setShowLogModal(true)} className="btn-primary flex items-center gap-2 px-6 py-2 rounded-2xl text-sm font-medium">
               <Plus size={17} /> LOG TRADE
             </button>
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="flex-1 overflow-auto p-8">
           <AnimatePresence mode="wait">
             {/* DASHBOARD */}
@@ -129,15 +130,19 @@ export default function TradeVault() {
                       <button onClick={() => setCurrentView("analytics")} className="text-xs text-emerald-500 tracking-widest hover:underline">VIEW ALL →</button>
                     </div>
                     <div className="space-y-3">
-                      {trades.slice(0, 5).map((trade) => (
-                        <div key={trade.id} className="flex items-center justify-between p-4 rounded-2xl bg-[#0A0A0A] border border-[#1F1F1F]">
-                          <div className="flex items-center gap-4">
-                            <div className={`px-3 py-1 rounded-xl text-xs font-mono tracking-widest ${trade.direction === "LONG" ? "bg-emerald-950 text-emerald-400" : "bg-red-950 text-red-400"}`}>{trade.direction}</div>
-                            <div className="font-medium">{trade.pair}</div>
+                      {trades.length > 0 ? (
+                        trades.slice(0, 5).map((trade) => (
+                          <div key={trade.id} className="flex items-center justify-between p-4 rounded-2xl bg-[#0A0A0A] border border-[#1F1F1F]">
+                            <div className="flex items-center gap-4">
+                              <div className={`px-3 py-1 rounded-xl text-xs font-mono tracking-widest ${trade.direction === "LONG" ? "bg-emerald-950 text-emerald-400" : "bg-red-950 text-red-400"}`}>{trade.direction}</div>
+                              <div className="font-medium">{trade.pair}</div>
+                            </div>
+                              <div className={`font-mono text-lg tracking-tight ${trade.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>{trade.pnl >= 0 ? "+" : ""}${trade.pnl.toFixed(1)}</div>
                           </div>
-                          <div className={`font-mono text-lg tracking-tight ${trade.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>{trade.pnl >= 0 ? "+" : ""}${trade.pnl.toFixed(1)}</div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-[#A1A1AA] text-sm">No trades logged yet. Start building your edge.</div>
+                      )}
                     </div>
                   </div>
 
@@ -178,7 +183,7 @@ export default function TradeVault() {
                     <div className="text-sm text-[#A1A1AA] space-y-1">
                       <div>FOMO trades: {trades.filter((t) => t.fomoDetected).length}</div>
                       <div>Revenge trades: {trades.filter((t) => t.revengeTrade).length}</div>
-                      <div>Avg Discipline: {(trades.reduce((sum, t) => sum + t.disciplineScore, 0) / trades.length || 0).toFixed(1)}/10</div>
+                      <div>Avg Discipline: {avgDiscipline}/10</div>
                     </div>
                   </div>
                 </div>
@@ -209,8 +214,8 @@ export default function TradeVault() {
               <div className="max-w-xl">
                 <div className="text-3xl font-semibold tracking-[-1px] mb-8">Settings</div>
                 <div className="card rounded-3xl p-8">
-                  <div className="text-sm text-[#A1A1AA]">Production settings and preferences will be available here in the next update.</div>
-                  <button onClick={() => { if (confirm("Clear all local data?")) { clearAll(); toast.success("All data cleared"); } }} className="mt-6 text-red-400 text-sm underline">Clear All Local Data</button>
+                  <div className="text-sm text-[#A1A1AA]">More production settings coming in next updates.</div>
+                  <button onClick={() => { if (confirm("Clear all local journal data? This cannot be undone.")) { clearAll(); toast.success("All data cleared"); } }} className="mt-6 text-red-400 text-sm underline">Clear All Local Data</button>
                 </div>
               </div>
             )}
@@ -222,14 +227,11 @@ export default function TradeVault() {
       <AnimatePresence>
         {showLogModal && (
           <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-6" onClick={() => setShowLogModal(false)}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 20 }}
-              className="w-full max-w-3xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="card rounded-3xl p-8">
+            <motion.div initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }} className="w-full max-w-3xl" onClick={e => e.stopPropagation()}>
+              <div className="card rounded-3xl p-8 relative">
+                <button onClick={() => setShowLogModal(false)} className="absolute top-6 right-6 text-[#A1A1AA] hover:text-white">
+                  <X size={20} />
+                </button>
                 <TradeLogForm onSuccess={() => { setShowLogModal(false); setCurrentView("dashboard"); }} />
               </div>
             </div>
