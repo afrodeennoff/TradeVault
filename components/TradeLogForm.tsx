@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { toast } from "sonner";
-import RichTextEditor from "./RichTextEditor";
 import { useTradeStore } from "@/store/tradeStore";
 import { TradeInput, EmotionalState, Direction, Market, Session } from "@/lib/types";
 
@@ -33,7 +32,7 @@ export default function TradeLogForm({ onSuccess }: { onSuccess?: () => void }) 
     fomoDetected: false,
     revengeTrade: false,
     patienceRating: 8,
-    notes: "<p></p>",
+    notes: "",
   });
 
   const update = (field: keyof TradeInput, value: any) => {
@@ -44,12 +43,12 @@ export default function TradeLogForm({ onSuccess }: { onSuccess?: () => void }) 
     e.preventDefault();
 
     if (!form.pair || !form.entryPrice || !form.stopLoss || !form.takeProfit) {
-      toast.error("Missing required fields", { description: "Pair, Entry, Stop Loss and Take Profit are required" });
+      toast.error("Missing required fields");
       return;
     }
 
     addTrade(form as TradeInput);
-    toast.success("Trade logged successfully", { description: `${form.pair} • R:R calculated` });
+    toast.success("Trade logged successfully");
 
     if (onSuccess) onSuccess();
   };
@@ -60,7 +59,6 @@ export default function TradeLogForm({ onSuccess }: { onSuccess?: () => void }) 
         <div className="text-2xl font-semibold tracking-tight">Log New Execution</div>
       </div>
 
-      {/* BASIC DATA */}
       <div>
         <div className="text-xs tracking-[2px] text-[#A1A1AA] mb-3">BASIC DATA</div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -77,20 +75,18 @@ export default function TradeLogForm({ onSuccess }: { onSuccess?: () => void }) 
         </div>
       </div>
 
-      {/* PRICES & RISK */}
       <div>
         <div className="text-xs tracking-[2px] text-[#A1A1AA] mb-3">PRICES & RISK</div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {["entryPrice", "stopLoss", "takeProfit", "riskPercent", "leverage"].map((field) => (
             <div key={field}>
               <div className="text-xs text-[#A1A1AA] mb-1 capitalize">{field.replace(/([A-Z])/g, ' $1')}</div>
-              <input type="number" step="0.01" value={(form as any)[field]} onChange={(e) => update(field as any, parseFloat(e.target.value) || 0)} className="w-full rounded-2xl px-4 py-3 text-sm bg-[#0F0F0F] border border-[#1F1F1F] font-mono" />
+              <input type="number" step="0.01" value={(form as any)[field] || 0} onChange={(e) => update(field as any, parseFloat(e.target.value) || 0)} className="w-full rounded-2xl px-4 py-3 text-sm bg-[#0F0F0F] border border-[#1F1F1F] font-mono" />
             </div>
           ))}
         </div>
       </div>
 
-      {/* STRATEGY / ICT */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div className="text-xs tracking-[2px] text-[#A1A1AA] mb-3">STRATEGY / ICT</div>
@@ -102,18 +98,17 @@ export default function TradeLogForm({ onSuccess }: { onSuccess?: () => void }) 
           </div>
         </div>
 
-        {/* PSYCHOLOGY */}
         <div>
           <div className="text-xs tracking-[2px] text-[#A1A1AA] mb-3">PSYCHOLOGY</div>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="text-xs text-[#A1A1AA] mb-1">Confidence (1-10)</div>
-                <input type="number" min="1" max="10" value={form.confidenceLevel} onChange={(e) => update("confidenceLevel", parseInt(e.target.value))} className="w-full rounded-2xl px-4 py-3 text-sm bg-[#0F0F0F] border border-[#1F1F1F]" />
+                <div className="text-xs text-[#A1A1AA] mb-1">Confidence</div>
+                <input type="number" min="1" max="10" value={form.confidenceLevel || 7} onChange={(e) => update("confidenceLevel", parseInt(e.target.value))} className="w-full rounded-2xl px-4 py-3 text-sm bg-[#0F0F0F] border border-[#1F1F1F]" />
               </div>
               <div>
-                <div className="text-xs text-[#A1A1AA] mb-1">Discipline (1-10)</div>
-                <input type="number" min="1" max="10" value={form.disciplineScore} onChange={(e) => update("disciplineScore", parseInt(e.target.value))} className="w-full rounded-2xl px-4 py-3 text-sm bg-[#0F0F0F] border border-[#1F1F1F]" />
+                <div className="text-xs text-[#A1A1AA] mb-1">Discipline</div>
+                <input type="number" min="1" max="10" value={form.disciplineScore || 8} onChange={(e) => update("disciplineScore", parseInt(e.target.value))} className="w-full rounded-2xl px-4 py-3 text-sm bg-[#0F0F0F] border border-[#1F1F1F]" />
               </div>
             </div>
 
@@ -123,29 +118,29 @@ export default function TradeLogForm({ onSuccess }: { onSuccess?: () => void }) 
 
             <div className="flex gap-6 text-sm pt-1">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={form.fomoDetected} onChange={(e) => update("fomoDetected", e.target.checked)} className="accent-emerald-500" /> FOMO detected
+                <input type="checkbox" checked={form.fomoDetected} onChange={(e) => update("fomoDetected", e.target.checked)} className="accent-emerald-500" /> FOMO
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={form.revengeTrade} onChange={(e) => update("revengeTrade", e.target.checked)} className="accent-emerald-500" /> Revenge trade
+                <input type="checkbox" checked={form.revengeTrade} onChange={(e) => update("revengeTrade", e.target.checked)} className="accent-emerald-500" /> Revenge
               </label>
             </div>
           </div>
         </div>
       </div>
 
-      {/* RICH TEXT NOTES - From Qunt Edge v3 */}
       <div>
-        <div className="text-xs tracking-[2px] text-[#A1A1AA] mb-2">DETAILED JOURNAL NOTES (Rich Text)</div>
-        <RichTextEditor
-          content={form.notes || ""}
-          onChange={(html) => update("notes", html)}
-          placeholder="Document your execution quality, what you saw in market structure, emotional state during the trade, and lessons learned..."
+        <div className="text-xs tracking-[2px] text-[#A1A1AA] mb-2">NOTES</div>
+        <textarea 
+          value={form.notes || ""} 
+          onChange={(e) => update("notes", e.target.value)} 
+          placeholder="What went well? What will you improve?" 
+          rows={4} 
+          className="w-full rounded-3xl px-4 py-3 text-sm bg-[#0F0F0F] border border-[#1F1F1F]" 
         />
-        <div className="text-[10px] text-[#555] mt-1.5 px-1">Use the toolbar above. This supports rich formatting and will power future AI analysis.</div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4">
-        <button type="submit" className="btn-primary px-10 py-3.5 rounded-2xl font-semibold text-sm tracking-wide">SAVE TRADE TO JOURNAL</button>
+      <div className="flex justify-end pt-4">
+        <button type="submit" className="btn-primary px-10 py-3.5 rounded-2xl font-semibold text-sm">SAVE TRADE</button>
       </div>
     </form>
   );
