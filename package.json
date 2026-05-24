@@ -1,6 +1,6 @@
 {
   "name": "tradevault",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -10,6 +10,20 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
+    "@tiptap/core": "^2.11.7",
+    "@tiptap/extension-bold": "^2.11.7",
+    "@tiptap/extension-document": "^2.11.7",
+    "@tiptap/extension-heading": "^2.11.7",
+    "@tiptap/extension-italic": "^2.11.7",
+    "@tiptap/extension-list-item": "^2.11.7",
+    "@tiptap/extension-paragraph": "^2.11.7",
+    "@tiptap/extension-placeholder": "^2.11.7",
+    "@tiptap/extension-table": "^2.11.7",
+    "@tiptap/extension-table-cell": "^2.11.7",
+    "@tiptap/extension-table-header": "^2.11.7",
+    "@tiptap/extension-table-row": "^2.11.7",
+    "@tiptap/extension-text": "^2.11.7",
+    "@tiptap/react": "^2.11.7",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.10.0",
@@ -20,6 +34,7 @@
     "react-hook-form": "^7.56.3",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.2.0",
+    "zustand": "^5.0.3",
     "zod": "^3.24.3"
   },
   "devDependencies": {
