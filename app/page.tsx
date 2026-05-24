@@ -29,13 +29,21 @@ export default function TradeVault() {
       toast.error("No trades to export");
       return;
     }
+
     const headers = ["pair", "direction", "entryTime", "pnl", "rrAchieved", "emotionalState", "disciplineScore", "fomoDetected", "notes"];
     const csvRows = trades.map((t) => [
-      t.pair, t.direction, t.entryTime, t.pnl, t.rrAchieved, t.emotionalState, t.disciplineScore, t.fomoDetected,
+      t.pair,
+      t.direction,
+      t.entryTime,
+      t.pnl,
+      t.rrAchieved,
+      t.emotionalState,
+      t.disciplineScore,
+      t.fomoDetected,
       `"${(t.notes || "").replace(/"/g, '""')}"`
     ]);
-    const csvContent = [headers.join(","), ...csvRows.map((row) => row.join(","))].join("\n");
 
+    const csvContent = [headers.join(","), ...csvRows.map((row) => row.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -43,12 +51,14 @@ export default function TradeVault() {
     link.download = `tradevault_${format(new Date(), "yyyy-MM-dd")}.csv`;
     link.click();
     URL.revokeObjectURL(url);
+
     toast.success("Journal exported successfully");
   };
 
   // AI Coach
   const getAIInsights = () => {
     const insights: string[] = [];
+
     if (metrics.totalTrades > 5 && metrics.winRate < 48) {
       insights.push("Your win rate is below 48%. Be extremely selective. Only take A+ setups.");
     }
@@ -62,12 +72,13 @@ export default function TradeVault() {
     if (insights.length === 0 && metrics.totalTrades > 4) {
       insights.push("Execution quality is solid. Continue logging with rich detail to compound your edge.");
     }
+
     return insights.length > 0 ? insights : ["Log more trades with full psychology data to unlock deeper coaching."];
   };
 
   const aiInsights = getAIInsights();
 
-  // Safe average discipline (fixes NaN when no trades)
+  // Safe average discipline calculation
   const avgDiscipline = trades.length > 0
     ? (trades.reduce((sum, t) => sum + t.disciplineScore, 0) / trades.length).toFixed(1)
     : "0.0";
@@ -129,6 +140,7 @@ export default function TradeVault() {
                       <div className="font-semibold tracking-tight">Recent Executions</div>
                       <button onClick={() => setCurrentView("analytics")} className="text-xs text-emerald-500 tracking-widest hover:underline">VIEW ALL →</button>
                     </div>
+
                     <div className="space-y-3">
                       {trades.length > 0 ? (
                         trades.slice(0, 5).map((trade) => (
@@ -137,7 +149,7 @@ export default function TradeVault() {
                               <div className={`px-3 py-1 rounded-xl text-xs font-mono tracking-widest ${trade.direction === "LONG" ? "bg-emerald-950 text-emerald-400" : "bg-red-950 text-red-400"}`}>{trade.direction}</div>
                               <div className="font-medium">{trade.pair}</div>
                             </div>
-                              <div className={`font-mono text-lg tracking-tight ${trade.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>{trade.pnl >= 0 ? "+" : ""}${trade.pnl.toFixed(1)}</div>
+                            <div className={`font-mono text-lg tracking-tight ${trade.pnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>{trade.pnl >= 0 ? "+" : ""}${trade.pnl.toFixed(1)}</div>
                           </div>
                         ))
                       ) : (
@@ -161,6 +173,7 @@ export default function TradeVault() {
             {currentView === "analytics" && (
               <div className="max-w-5xl">
                 <div className="text-3xl font-semibold tracking-[-1px] mb-8">Performance Intelligence</div>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                   <div className="card rounded-3xl p-6">
                     <div className="text-xs text-[#A1A1AA] tracking-widest mb-4">OVERALL</div>
@@ -170,6 +183,7 @@ export default function TradeVault() {
                       <div className="flex justify-between"><span>Expectancy</span><span className="font-mono">${metrics.expectancy}</span></div>
                     </div>
                   </div>
+
                   <div className="card rounded-3xl p-6">
                     <div className="text-xs text-[#A1A1AA] tracking-widest mb-4">STREAKS & RISK</div>
                     <div className="space-y-3 text-sm">
@@ -178,6 +192,7 @@ export default function TradeVault() {
                       <div className="flex justify-between"><span>Max Drawdown</span><span className="font-mono text-red-400">${metrics.maxDrawdown}</span></div>
                     </div>
                   </div>
+
                   <div className="card rounded-3xl p-6">
                     <div className="text-xs text-[#A1A1AA] tracking-widest mb-4">BEHAVIORAL</div>
                     <div className="text-sm text-[#A1A1AA] space-y-1">
@@ -187,6 +202,7 @@ export default function TradeVault() {
                     </div>
                   </div>
                 </div>
+
                 <EquityCurve trades={trades} />
               </div>
             )}
@@ -215,7 +231,17 @@ export default function TradeVault() {
                 <div className="text-3xl font-semibold tracking-[-1px] mb-8">Settings</div>
                 <div className="card rounded-3xl p-8">
                   <div className="text-sm text-[#A1A1AA]">More production settings coming in next updates.</div>
-                  <button onClick={() => { if (confirm("Clear all local journal data? This cannot be undone.")) { clearAll(); toast.success("All data cleared"); } }} className="mt-6 text-red-400 text-sm underline">Clear All Local Data</button>
+                  <button
+                    onClick={() => {
+                      if (confirm("Clear all local journal data? This cannot be undone.")) {
+                        clearAll();
+                        toast.success("All data cleared");
+                      }
+                    }}
+                    className="mt-6 text-red-400 text-sm underline"
+                  >
+                    Clear All Local Data
+                  </button>
                 </div>
               </div>
             )}
@@ -227,7 +253,13 @@ export default function TradeVault() {
       <AnimatePresence>
         {showLogModal && (
           <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-6" onClick={() => setShowLogModal(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }} className="w-full max-w-3xl" onClick={e => e.stopPropagation()}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 20 }}
+              className="w-full max-w-3xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="card rounded-3xl p-8 relative">
                 <button onClick={() => setShowLogModal(false)} className="absolute top-6 right-6 text-[#A1A1AA] hover:text-white">
                   <X size={20} />
